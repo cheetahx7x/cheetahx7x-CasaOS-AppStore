@@ -99,7 +99,7 @@ x-casaos:
   index: /
   title:
     en_US: Ollama(Nvidia GPU)
-  version: "0.30.7"
+  version: "0.30.7-Fix1"
   updateAt: "2026-06-09"
   releaseNotes:
   website: "https://ollama.com/"
