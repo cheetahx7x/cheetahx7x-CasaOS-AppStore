@@ -36,7 +36,7 @@ x-casaos:
     - amd64
     - arm64
   main: ollama
-  category: Chat
+  category: cheetahx7x
   developer: ollama
   author: ollama
   tagline:
