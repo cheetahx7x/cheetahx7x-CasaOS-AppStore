@@ -3,8 +3,6 @@ services:
   adguard-home-services:
     image: adguard/adguardhome:v0.107.77
     container_name: adguard-home-services
-    cpu_shares: 90
-    command: []
     deploy:
       resources:
         limits:
@@ -12,8 +10,6 @@ services:
         reservations:
           memory: "67108864"
           devices: []
-    labels:
-      icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/adguard-home.png
     restart: unless-stopped
     networks:
       Services:

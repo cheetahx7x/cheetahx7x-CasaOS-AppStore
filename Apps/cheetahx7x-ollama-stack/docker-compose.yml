@@ -20,6 +20,7 @@ services:
       - type: bind
         source: /media/SSD-Storage/.ollama
         target: /root/.ollama
+    privileged: false
     x-casaos:
       volumes:
         - container: /media/SSD-Storage/.ollama
