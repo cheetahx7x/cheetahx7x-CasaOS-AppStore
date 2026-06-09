@@ -16,24 +16,48 @@ services:
     restart: unless-stopped
     networks:
       - ollama-internal
-    ports:
-      - target: 11434
-        published: "11434"
-        protocol: tcp
     volumes:
       - type: bind
         source: /media/SSD-Storage/.ollama
         target: /root/.ollama
     x-casaos:
-      ports:
-        - container: "11434"
-          description:
-            en_US: Ollama API Port
       volumes:
         - container: /media/SSD-Storage/.ollama
           description:
             en_US: Ollama Models and Data Directory
+
+  openwebui-ollama:
+    image: ghcr.io/open-webui/open-webui:v0.9.6-ollama
+    runtime: nvidia
+    depends_on:
+      ollama:
+        condition: service_started
+        required: true
+    ipc: host
+    environment:
+      CPU_FALLBACK: "true"
+      NVIDIA_VISIBLE_DEVICES: all
+    deploy:
+      resources:
+        reservations:
+          memory: "512M"
+    networks:
+      - Services
+      - ollama-internal
+    restart: always
+    volumes:
+      - type: bind
+        source: /DATA/AppData/openwebui-ollama/openwebui
+        target: /app/backend/data
+      - type: bind
+        source: /DATA/AppData/openwebui-ollama/ollama
+        target: /root/.ollama
+    privileged: false
+    container_name: openwebui-ollama
 networks:
+  Services:
+    name: Services
+    external: true
   ollama-internal:
     name: ollama-internal
     driver: ipvlan
@@ -44,8 +68,8 @@ x-casaos:
     - arm64
   main: ollama
   category: cheetahx7x
-  developer: ollama
-  author: ollama
+  developer: cheetahx7x
+  author: cheetahx7x
   tagline:
     en_US: Get up and running with large language models locally
   description:
@@ -94,12 +118,13 @@ x-casaos:
     - https://cdn.jsdelivr.net/gh/IceWhaleTech/CasaOS-AppStore@main/Apps/Ollama/screenshot-2.png
     - https://cdn.jsdelivr.net/gh/IceWhaleTech/CasaOS-AppStore@main/Apps/Ollama/screenshot-3.png
   thumbnail: ""
-  scheme: http
-  port_map: "11434"
+  scheme: https
+  hostname: ollama.fabi.ng
+  port_map: "443"
   index: /
   title:
-    en_US: Ollama(Nvidia GPU)
-  version: "0.30.7-Fix1"
+    en_US: Ollama Stack (Nvidia GPU)
+  version: "1.0"
   updateAt: "2026-06-09"
   releaseNotes:
   website: "https://ollama.com/"
