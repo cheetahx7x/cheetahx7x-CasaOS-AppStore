@@ -11,7 +11,9 @@ services:
       resources:
         reservations:
           memory: "512M"
-    network_mode: bridge
+    networks:
+      - Services
+      - ollama-internal
     ports:
       - target: 8080
         published: "3050"
@@ -26,6 +28,14 @@ services:
         target: /root/.ollama
     privileged: false
     container_name: openwebui-ollama
+networks:
+  Services:
+    name: Services
+    external: true
+  ollama-internal:
+    name: ollama-internal
+    external: true
+
 x-casaos:
   architectures:
     - amd64

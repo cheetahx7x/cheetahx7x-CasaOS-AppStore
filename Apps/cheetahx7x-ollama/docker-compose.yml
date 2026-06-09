@@ -14,6 +14,8 @@ services:
               count: all
               capabilities: [gpu]
     restart: unless-stopped
+    networks:
+      - ollama-internal
     ports:
       - target: 11434
         published: "11434"
@@ -31,6 +33,11 @@ services:
         - container: /media/SSD-Storage/.ollama
           description:
             en_US: Ollama Models and Data Directory
+networks:
+  ollama-internal:
+    name: ollama-internal
+    driver: ipvlan
+
 x-casaos:
   architectures:
     - amd64
