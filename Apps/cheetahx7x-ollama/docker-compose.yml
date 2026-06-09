@@ -20,8 +20,8 @@ services:
         protocol: tcp
     volumes:
       - type: bind
-        source: /DATA/AppData/$AppID/
-        target: /media/SSD-Storage/.ollama
+        source: /media/SSD-Storage/.ollama
+        target: /root/.ollama
     x-casaos:
       ports:
         - container: "11434"
