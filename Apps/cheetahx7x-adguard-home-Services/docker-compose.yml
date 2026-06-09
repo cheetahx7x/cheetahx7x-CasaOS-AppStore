@@ -1,0 +1,81 @@
+name: adguard-home-services
+services:
+  adguard-home-services:
+    cpu_shares: 90
+    command: []
+    container_name: adguard-home-services
+    deploy:
+      resources:
+        limits:
+          memory: 33563631616
+        reservations:
+          memory: "67108864"
+          devices: []
+    image: adguard/adguardhome:v0.107.77
+    labels:
+      icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/adguard-home.png
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData/adguard-home-dmz/data/work
+        target: /opt/adguardhome/work
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /DATA/AppData/adguard-home-dmz/data/conf
+        target: /opt/adguardhome/conf
+        bind:
+          create_host_path: true
+    x-casaos:
+      volumes:
+        - container: /opt/adguardhome/work
+          description:
+            en_us: "Container Path: /opt/adguardhome/work"
+        - container: /opt/adguardhome/conf
+          description:
+            en_us: "Container Path: /opt/adguardhome/conf"
+    ports: []
+    devices: []
+    cap_add: []
+    environment: []
+    networks:
+      Services:
+        ipv4_address: 192.168.3.252
+    privileged: false
+networks:
+  Services:
+    name: Services
+    external: true
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+  author: cheehtahx7x
+  category: cheetahx7x
+  description:
+    en_us: AdGuard Home is a network-wide software for blocking ads and tracking.
+      After you set it up, it'll cover all your home devices, and you won't need
+      any client-side software for that. Learn more on our official Github
+      repository.
+  developer: AdGuardTeam
+  hostname: adguard.fabi.ng
+  icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/adguard-home.png
+  index: /
+  is_uncontrolled: false
+  main: adguard-home-services
+  port_map: "443"
+  scheme: https
+  screenshot_link:
+    - https://cdn.jsdelivr.net/gh/IceWhaleTech/CasaOS-AppStore@main/Apps/AdGuardHome/screenshot-1.png
+    - https://cdn.jsdelivr.net/gh/IceWhaleTech/CasaOS-AppStore@main/Apps/AdGuardHome/screenshot-2.png
+    - https://cdn.jsdelivr.net/gh/IceWhaleTech/CasaOS-AppStore@main/Apps/AdGuardHome/screenshot-3.png
+  store_app_id: adguard-home-services
+  version: "1.0"
+  updateAt: "2026-06-09"
+  tagline:
+    en_us: Network-wide ads & trackers blocking DNS server.
+  thumbnail: https://cdn.jsdelivr.net/gh/IceWhaleTech/CasaOS-AppStore@main/Apps/AdGuardHome/thumbnail.png
+  tips:
+  title:
+    custom: ""
+    en_us: AdGuard Home Services
