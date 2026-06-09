@@ -28,6 +28,7 @@ services:
 
   openwebui-ollama:
     image: ghcr.io/open-webui/open-webui:v0.9.6-ollama
+    container_name: openwebui-ollama
     runtime: nvidia
     depends_on:
       ollama:
@@ -54,7 +55,6 @@ services:
         source: /DATA/AppData/openwebui-ollama/ollama
         target: /root/.ollama
     privileged: false
-    container_name: openwebui-ollama
 networks:
   Services:
     name: Services
