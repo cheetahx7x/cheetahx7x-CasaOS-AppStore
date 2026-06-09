@@ -1,0 +1,301 @@
+name: cheetahx7x-authentik
+services:
+  authentik:
+    cpu_shares: 90
+    command:
+      - server
+    container_name: authentik
+    depends_on:
+      authentik-db:
+        condition: service_started
+        required: true
+      authentik-redis:
+        condition: service_started
+        required: true
+    deploy:
+      resources:
+        limits:
+          memory: 33563631616
+        reservations:
+          devices: []
+    environment:
+      - AUTHENTIK_POSTGRESQL__HOST=authentik-db
+      - AUTHENTIK_POSTGRESQL__NAME=authentik
+      - AUTHENTIK_POSTGRESQL__PASSWORD=password
+      - AUTHENTIK_POSTGRESQL__USER=authentik
+      - AUTHENTIK_REDIS__HOST=authentik-redis
+      - AUTHENTIK_SECRET_KEY=secret
+    image: ghcr.io/goauthentik/server:2025.10.3
+    labels:
+      icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/authentik.png
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData/authentik/data/authentik-media
+        target: /media
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /DATA/AppData/authentik/data/authentik-custom-templates
+        target: /templates
+        bind:
+          create_host_path: true
+    x-casaos:
+      envs:
+        - container: AUTHENTIK_REDIS__HOST
+          description:
+            en_us: "Container Variable: AUTHENTIK_REDIS__HOST"
+        - container: AUTHENTIK_POSTGRESQL__HOST
+          description:
+            en_us: "Container Variable: AUTHENTIK_POSTGRESQL__HOST"
+        - container: AUTHENTIK_POSTGRESQL__USER
+          description:
+            en_us: "Container Variable: AUTHENTIK_POSTGRESQL__USER"
+        - container: AUTHENTIK_POSTGRESQL__NAME
+          description:
+            en_us: "Container Variable: AUTHENTIK_POSTGRESQL__NAME"
+        - container: AUTHENTIK_POSTGRESQL__PASSWORD
+          description:
+            en_us: "Container Variable: AUTHENTIK_POSTGRESQL__PASSWORD"
+        - container: AUTHENTIK_SECRET_KEY
+          description:
+            en_us: "Container Variable: AUTHENTIK_SECRET_KEY"
+      volumes:
+        - container: /media
+          description:
+            en_us: "Container Path: /media"
+        - container: /templates
+          description:
+            en_us: "Container Path: /templates"
+    ports: []
+    devices: []
+    cap_add: []
+    networks:
+      - Services
+      - authentik-internal
+    privileged: false
+  authentik-db:
+    cpu_shares: 90
+    command: []
+    container_name: authentik-db
+    deploy:
+      resources:
+        limits:
+          memory: 33563631616
+        reservations:
+          devices: []
+    environment:
+      - POSTGRES_DB=authentik
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=authentik
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "pg_isready -d  -U "
+      timeout: 5s
+      interval: 30s
+      retries: 5
+      start_period: 20s
+    image: postgres:14-alpine
+    labels:
+      icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/authentik.png
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData/authentik/data/postgres
+        target: /var/lib/postgresql/data
+        bind:
+          create_host_path: true
+    x-casaos:
+      envs:
+        - container: POSTGRES_PASSWORD
+          description:
+            en_us: "Container Variable: POSTGRES_PASSWORD"
+        - container: POSTGRES_USER
+          description:
+            en_us: "Container Variable: POSTGRES_USER"
+        - container: POSTGRES_DB
+          description:
+            en_us: "Container Variable: POSTGRES_DB"
+      volumes:
+        - container: /var/lib/postgresql/data
+          description:
+            en_us: "Container Path: /var/lib/postgresql/data"
+    ports: []
+    devices: []
+    cap_add: []
+    networks:
+      - authentik-internal
+    privileged: false
+  authentik-redis:
+    cpu_shares: 90
+    command:
+      - --save
+      - "60"
+      - "1"
+      - --loglevel
+      - warning
+    container_name: authentik-redis
+    deploy:
+      resources:
+        limits:
+          memory: 33563631616
+        reservations:
+          devices: []
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - redis-cli ping | grep PONG
+      timeout: 3s
+      interval: 30s
+      retries: 5
+      start_period: 20s
+    image: redis:8.2.2-alpine@sha256:1c78f5e7512cc8b22b0edc95c20e7abd9e1fd832e5dfd5c3c6b59ce82fb238d0
+    labels:
+      icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/authentik.png
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData/authentik/data/redis
+        target: /data
+        bind:
+          create_host_path: true
+    x-casaos:
+      volumes:
+        - container: /data
+          description:
+            en_us: "Container Path: /data"
+    ports: []
+    devices: []
+    cap_add: []
+    environment: []
+    networks:
+      - authentik-internal
+    privileged: false
+  authentik-worker:
+    cpu_shares: 90
+    command:
+      - worker
+    container_name: authentik-worker
+    depends_on:
+      authentik-db:
+        condition: service_started
+        required: true
+      authentik-redis:
+        condition: service_started
+        required: true
+    deploy:
+      resources:
+        limits:
+          memory: 33563631616
+        reservations:
+          devices: []
+    environment:
+      - AUTHENTIK_POSTGRESQL__HOST=authentik-db
+      - AUTHENTIK_POSTGRESQL__NAME=authentik
+      - AUTHENTIK_POSTGRESQL__PASSWORD=password
+      - AUTHENTIK_POSTGRESQL__USER=authentik
+      - AUTHENTIK_REDIS__HOST=authentik-redis
+      - AUTHENTIK_SECRET_KEY=secret
+    image: ghcr.io/goauthentik/server:2025.10.3
+    labels:
+      icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/authentik.png
+    restart: unless-stopped
+    user: root
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /DATA/AppData/authentik/data/authentik-media
+        target: /media
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /DATA/AppData/authentik/data/authentik-certs
+        target: /certs
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /DATA/AppData/authentik/data/authentik-custom-templates
+        target: /templates
+        bind:
+          create_host_path: true
+    x-casaos:
+      envs:
+        - container: AUTHENTIK_REDIS__HOST
+          description:
+            en_us: "Container Variable: AUTHENTIK_REDIS__HOST"
+        - container: AUTHENTIK_POSTGRESQL__HOST
+          description:
+            en_us: "Container Variable: AUTHENTIK_POSTGRESQL__HOST"
+        - container: AUTHENTIK_POSTGRESQL__USER
+          description:
+            en_us: "Container Variable: AUTHENTIK_POSTGRESQL__USER"
+        - container: AUTHENTIK_POSTGRESQL__NAME
+          description:
+            en_us: "Container Variable: AUTHENTIK_POSTGRESQL__NAME"
+        - container: AUTHENTIK_POSTGRESQL__PASSWORD
+          description:
+            en_us: "Container Variable: AUTHENTIK_POSTGRESQL__PASSWORD"
+        - container: AUTHENTIK_SECRET_KEY
+          description:
+            en_us: "Container Variable: AUTHENTIK_SECRET_KEY"
+      volumes:
+        - container: /var/run/docker.sock
+          description:
+            en_us: "Container Path: /var/run/docker.sock"
+        - container: /media
+          description:
+            en_us: "Container Path: /media"
+        - container: /certs
+          description:
+            en_us: "Container Path: /certs"
+        - container: /templates
+          description:
+            en_us: "Container Path: /templates"
+    ports: []
+    devices: []
+    cap_add: []
+    networks:
+      - authentik-internal
+    privileged: false
+networks:
+  Services:
+    name: Services
+    external: true
+  authentik-internal:
+    name: authentik-internal
+    driver: ipvlan
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+  author: cheetahx7x
+  category: cheetahx7x
+  description:
+    en_us: Authentik is a self-hosted identity and access management platform that
+      provides a secure and scalable solution for managing user accounts,
+      authentication, and authorization. It offers a range of features,
+      including user management, role-based access control, and multi-factor
+      authentication. Authentik is designed to be easy to use and integrate with
+      your existing systems, making it a great choice for organizations looking
+      to improve their security and compliance.
+  developer: authentik
+  hostname: authentik.fabi.ng
+  icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/authentik.png
+  index: /
+  is_uncontrolled: false
+  main: authentik
+  port_map: "443"
+  scheme: https
+  store_app_id: cheetahx7x-authentik
+  tagline:
+    en_us: Authentik
+  thumbnail: ""
+  tips:
+  title:
+    custom: ""
+    en_us: Authentik

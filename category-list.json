@@ -1,5 +1,10 @@
 [
   {
+    "name": "cheetahx7x",
+    "font": "cloud-outline",
+    "description": "Cheetahx7x Custom Apps"
+  },
+  {
     "name": "Analytics",
     "font": "chart-areaspline",
     "description": "Analysis Apps"
