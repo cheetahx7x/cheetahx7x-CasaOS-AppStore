@@ -44,6 +44,7 @@ services:
     networks:
       - Services
       - ollama-internal
+    dns: adguard-home-dmz
     restart: always
     volumes:
       - type: bind
